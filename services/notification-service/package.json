@@ -1,11 +1,10 @@
 {
-  "name": "user-service",
+  "name": "notification-service",
   "version": "1.0.0",
-  "description": "User service for e-commerce personalized notification system",
+  "description": "Notification service for e-commerce personalized notification system",
   "main": "src/app.js",
-  "keywords": [],
-  "author": "Nikunj Khinchi",
   "license": "ISC",
+  "author": "Nikunj Khinchi",
   "type": "commonjs",
   "scripts": {
     "start": "node src/app.js",
@@ -14,11 +13,10 @@
   },
   "dependencies": {
     "amqplib": "^0.10.3",
-    "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "express": "^4.18.2",
-    "jsonwebtoken": "^9.0.0",
     "mongoose": "^7.0.3",
+    "node-cron": "^3.0.2",
     "on-finished": "^2.4.1",
     "winston": "^3.17.0"
   },
