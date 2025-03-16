@@ -14,7 +14,7 @@ const initScheduler = () => {
         try {
             await orderUpdateJob.processOrderUpdates();
         } catch (error) {
-            console.error('Error in order update job:', error);
+            logger.error('Error in order update job:', error);
         }
     });
 
@@ -23,7 +23,7 @@ const initScheduler = () => {
         try {
             await promotionJob.processPromotions();
         } catch (error) {
-            console.error('Error in promotion job:', error);
+            logger.error('Error in promotion job:', error);
         }
     });
 

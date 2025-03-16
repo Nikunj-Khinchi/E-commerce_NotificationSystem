@@ -8,6 +8,7 @@ const rabbitmq = require('./utils/rabbitmq');
 const scheduler = require('./jobs/scheduler');
 const NotificationService = require('./services/notification.service');
 const requestLogger = require('./middlewares/requestLogger.middleware');
+const logger = require('./utils/logger');
 
 // Initialize express app
 const app = express();
@@ -27,7 +28,7 @@ app.get('/health', (req, res) => {
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-    console.error(err.stack);
+    logger.error(err.stack);
     res.status(500).json({
         success: false,
         message: 'Something went wrong',
@@ -42,7 +43,7 @@ const setupConsumers = async () => {
         config.rabbitmq.queues.userCreated,
         async (message) => {
             try {
-                console.log('Received user created event:', message);
+                logger.info('Received user created event:', message);
 
                 // Create welcome notification
                 await NotificationService.createNotification({
@@ -55,9 +56,9 @@ const setupConsumers = async () => {
                     }
                 });
 
-                console.log('Created welcome notification for user:', message.userId);
+                logger.info('Created welcome notification for user:', message.userId);
             } catch (error) {
-                console.error('Error processing user created event:', error);
+                logger.error('Error processing user created event:', error);
             }
         }
     );
@@ -67,12 +68,12 @@ const setupConsumers = async () => {
         config.rabbitmq.queues.userPreferencesUpdated,
         async (message) => {
             try {
-                console.log('Received user preferences updated event:', message);
+                logger.info('Received user preferences updated event:', message);
 
                 // Here we could handle changes in notification preferences
                 // For example, if a user opts out of promotions, we could cancel scheduled promotions
             } catch (error) {
-                console.error('Error processing user preferences updated event:', error);
+                logger.error('Error processing user preferences updated event:', error);
             }
         }
     );
@@ -82,7 +83,7 @@ const setupConsumers = async () => {
         config.rabbitmq.queues.recommendations,
         async (message) => {
             try {
-                console.log('Received recommendation event:', message);
+                logger.info('Received recommendation event:', message);
 
                 // Create recommendation notification
                 await NotificationService.createRecommendationNotification(
@@ -94,9 +95,9 @@ const setupConsumers = async () => {
                     }
                 );
 
-                console.log('Created recommendation notification for user:', message.userId);
+                logger.info('Created recommendation notification for user:', message.userId);
             } catch (error) {
-                console.error('Error processing recommendation event:', error);
+                logger.error('Error processing recommendation event:', error);
             }
         }
     );
@@ -110,7 +111,7 @@ const startServer = async () => {
             useNewUrlParser: true,
             useUnifiedTopology: true
         });
-        console.log('Connected to MongoDB');
+        logger.info('Connected to MongoDB');
 
         // Connect to RabbitMQ
         await rabbitmq.connect();
@@ -123,17 +124,17 @@ const startServer = async () => {
 
         // Start server
         const server = app.listen(config.port, () => {
-            console.log(`Notification service running on port ${config.port}`);
+            logger.info(`Notification service running on port ${config.port}`);
         });
 
         // Handle graceful shutdown
         const shutdown = async () => {
-            console.log('Shutting down notification service...');
+            logger.info('Shutting down notification service...');
 
             server.close(async () => {
                 await mongoose.connection.close();
                 await rabbitmq.close();
-                console.log('Notification service shut down');
+                logger.info('Notification service shut down');
                 process.exit(0);
             });
         };
@@ -142,7 +143,7 @@ const startServer = async () => {
         process.on('SIGTERM', shutdown);
 
     } catch (error) {
-        console.error('Failed to start notification service:', error);
+        logger.error('Failed to start notification service:', error);
         process.exit(1);
     }
 };
