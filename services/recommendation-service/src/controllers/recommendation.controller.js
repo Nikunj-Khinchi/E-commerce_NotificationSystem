@@ -24,7 +24,9 @@ const createUserActivity = async (req, res) => {
             activityType,
             metadata
         });
-
+        
+        console.log("Activity created", activity);
+        
         res.status(201).json({
             success: true,
             data: {

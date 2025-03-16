@@ -24,12 +24,7 @@ const registerUser = async (req, res) => {
         res.status(201).json({
             success: true,
             data: {
-                user: {
-                    id: user._id,
-                    name: user.name,
-                    email: user.email,
-                    preferences: user.preferences
-                },
+                user,
                 token
             }
         });
@@ -53,16 +48,20 @@ const loginUser = async (req, res) => {
 
         const user = await UserService.loginUser(email, password);
         const token = jwtUtils.generateToken(user);
-
+        console.log("user", user);
+        
         res.status(200).json({
             success: true,
             data: {
-                user: {
-                    id: user._id,
-                    name: user.name,
-                    email: user.email,
-                    preferences: user.preferences
-                },
+                user,
+                // : {
+                //     id: user._id,
+                //     name: user.name,
+                //     email: user.email,
+                //     preferences: user.preferences,
+                //     createdAt: user.createdAt,
+                //     updatedAt: user.updatedAt
+                // },
                 token
             }
         });
@@ -88,12 +87,7 @@ const getUserDetails = async (req, res) => {
         res.status(200).json({
             success: true,
             data: {
-                user: {
-                    id: user._id,
-                    name: user.name,
-                    email: user.email,
-                    preferences: user.preferences
-                }
+                user
             }
         });
     } catch (error) {
@@ -120,12 +114,7 @@ const updateUserPreferences = async (req, res) => {
         res.status(200).json({
             success: true,
             data: {
-                user: {
-                    id: updatedUser._id,
-                    name: updatedUser.name,
-                    email: updatedUser.email,
-                    preferences: updatedUser.preferences
-                }
+                user : updatedUser
             }
         });
     } catch (error) {
