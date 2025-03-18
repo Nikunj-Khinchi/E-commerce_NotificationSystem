@@ -1,0 +1,139 @@
+version: "3.8"
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    volumes:
+      - mongodb_data:/data/db
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: ["redis-server", "--appendonly", "yes"]
+
+  rabbitmq:
+    image: rabbitmq:3.11-management
+    container_name: rabbitmq
+    restart: always
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+      - "15692:15692"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+
+  redis-exporter:
+    image: oliver006/redis_exporter
+    container_name: redis-exporter
+    restart: always
+    ports:
+      - "9121:9121"
+    environment:
+      - REDIS_ADDR=redis://redis:6379
+    depends_on:
+      - redis
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    restart: always
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    depends_on:
+      - rabbitmq
+      - user-service
+      - notification-service
+      - recommendation-service
+      - graphql-gateway
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+
+  user-service:
+    build: ./services/user-service
+    container_name: user-service
+    restart: always
+    ports:
+      - "3001:3001"
+    environment:
+      - MONGODB_URI=mongodb://root:example@mongodb:27017/userdb?authSource=admin
+      - RABBITMQ_URI=amqp://guest:guest@rabbitmq:5672
+      - JWT_SECRET=nikunj
+      - JWT_EXPIRY=24h
+    depends_on:
+      - mongodb
+      - rabbitmq
+
+  notification-service:
+    build: ./services/notification-service
+    container_name: notification-service
+    restart: always
+    ports:
+      - "3002:3002"
+    environment:
+      - MONGODB_URI=mongodb://root:example@mongodb:27017/notificationsdb?authSource=admin
+      - RABBITMQ_URI=amqp://guest:guest@rabbitmq:5672
+    depends_on:
+      - mongodb
+      - rabbitmq
+
+  recommendation-service:
+    build: ./services/recommendation-service
+    container_name: recommendation-service
+    restart: always
+    ports:
+      - "3003:3003"
+    environment:
+      - MONGODB_URI=mongodb://root:example@mongodb:27017/recommendationsdb?authSource=admin
+      - RABBITMQ_URI=amqp://guest:guest@rabbitmq:5672
+    depends_on:
+      - mongodb
+      - rabbitmq
+
+  graphql-gateway:
+    build: ./services/graphql-gateway
+    container_name: graphql-gateway
+    restart: always
+    ports:
+      - "4000:4000"
+    environment:
+      - MONGODB_URI=mongodb://root:example@mongodb:27017/gatewaydb?authSource=admin
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - USER_SERVICE_URL=http://user-service:3001
+      - NOTIFICATION_SERVICE_URL=http://notification-service:3002
+      - RECOMMENDATION_SERVICE_URL=http://recommendation-service:3003
+    depends_on:
+      - user-service
+      - notification-service
+      - recommendation-service
+      - redis
+
+volumes:
+  mongodb_data:
+  grafana_data:
+  redis_data:

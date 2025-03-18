@@ -1,15 +1,34 @@
-// services/notification-service/src/utils/rabbitmq.js
 const amqp = require('amqplib');
 const config = require('../config');
 const logger = require('./logger');
+const client = require('prom-client');
 
 let connection = null;
 let channel = null;
 
-/**
- * Connect to RabbitMQ
- * @returns {Promise<void>}
- */
+// Define Prometheus Metrics
+const metrics = {
+    queueSize: new client.Gauge({
+        name: 'rabbitmq_queue_size',
+        help: 'Number of messages in queue',
+        labelNames: ['queue']
+    }),
+    publishedMessages: new client.Counter({
+        name: 'rabbitmq_messages_published_total',
+        help: 'Total number of messages published',
+        labelNames: ['exchange', 'routing_key']
+    }),
+    consumedMessages: new client.Counter({
+        name: 'rabbitmq_messages_consumed_total',
+        help: 'Total number of messages consumed',
+        labelNames: ['queue']
+    }),
+    connectionStatus: new client.Gauge({
+        name: 'rabbitmq_connection_status',
+        help: 'Connection status (1 = connected, 0 = disconnected)'
+    })
+};
+
 const connect = async () => {
     try {
         connection = await amqp.connect(config.rabbitmq.uri);
@@ -32,47 +51,64 @@ const connect = async () => {
         await channel.bindQueue(config.rabbitmq.queues.userPreferencesUpdated, config.rabbitmq.exchanges.user, 'user.preferences.updated');
         await channel.bindQueue(config.rabbitmq.queues.recommendations, config.rabbitmq.exchanges.recommendation, 'recommendation.created');
 
+        // Set connection status
+        metrics.connectionStatus.set(1);
         logger.info('Connected to RabbitMQ');
+
+        // Start queue monitoring
+        startQueueMonitoring();
+
         return channel;
     } catch (error) {
+        metrics.connectionStatus.set(0);
         logger.error('RabbitMQ connection error:', error);
-        // Retry connection after delay
         setTimeout(connect, 5000);
         throw error;
     }
 };
 
-/**
- * Publish a message to an exchange
- * @param {String} exchange - Exchange name
- * @param {String} routingKey - Routing key
- * @param {Object} message - Message to publish
- * @returns {Promise<boolean>}
- */
+
+const startQueueMonitoring = () => {
+    // Prometheus Integration for Queue Size Monitoring
+    setInterval(async () => {
+        try {
+            const queues = Object.values(config.rabbitmq.queues);
+            for (const queue of queues) {
+                const queueInfo = await channel.checkQueue(queue);
+                metrics.queueSize.set({ queue }, queueInfo.messageCount);
+            }
+        } catch (error) {
+            logger.error('Queue monitoring error:', error);
+            metrics.connectionStatus.set(0);
+        }
+    }, 5000);
+};
+
 const publish = async (exchange, routingKey, message) => {
     try {
         if (!channel) {
             await connect();
         }
 
-        return channel.publish(
+        const published = await channel.publish(
             exchange,
             routingKey,
             Buffer.from(JSON.stringify(message)),
             { persistent: true }
         );
+
+        metrics.publishedMessages.inc({
+            exchange,
+            routing_key: routingKey
+        });
+
+        return published;
     } catch (error) {
         logger.error(`Error publishing message to ${exchange}:${routingKey}`, error);
         throw error;
     }
 };
 
-/**
- * Consume messages from a queue
- * @param {String} queue - Queue name
- * @param {Function} callback - Message handler
- * @returns {Promise<void>}
- */
 const consume = async (queue, callback) => {
     try {
         if (!channel) {
@@ -86,6 +122,8 @@ const consume = async (queue, callback) => {
                 const content = JSON.parse(msg.content.toString());
                 callback(content, msg);
                 channel.ack(msg);
+
+                metrics.consumedMessages.inc({ queue });
             }
         });
 
@@ -96,10 +134,6 @@ const consume = async (queue, callback) => {
     }
 };
 
-/**
- * Close the RabbitMQ connection
- * @returns {Promise<void>}
- */
 const close = async () => {
     try {
         if (channel) {
@@ -108,6 +142,7 @@ const close = async () => {
         if (connection) {
             await connection.close();
         }
+        metrics.connectionStatus.set(0);
         logger.info('Closed RabbitMQ connection');
     } catch (error) {
         logger.error('Error closing RabbitMQ connection:', error);
@@ -116,12 +151,12 @@ const close = async () => {
 };
 
 // Handle process termination
-process.on('SIGINT', async () => {
+process.once('SIGINT', async () => {
     await close();
     process.exit(0);
 });
 
-process.on('SIGTERM', async () => {
+process.once('SIGTERM', async () => {
     await close();
     process.exit(0);
 });
@@ -130,5 +165,6 @@ module.exports = {
     connect,
     publish,
     consume,
-    close
+    close,
+    metrics // Export metrics for testing
 };

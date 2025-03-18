@@ -15,9 +15,11 @@ module.exports = {
     jwt: {
         secret: process.env.JWT_SECRET || 'nikunj'
     },
-    cache: {
-        ttl: parseInt(process.env.CACHE_TTL) || 300, // 5 minutes in seconds
-        checkperiod: 60 // Check for expired keys every 60 seconds
+    redis: {
+        host: process.env.REDIS_HOST || 'localhost',
+        port: parseInt(process.env.REDIS_PORT) || 6379,
+        password: process.env.REDIS_PASSWORD || '',
+        ttl: parseInt(process.env.REDIS_TTL) || 300 // 5 minutes in seconds
     },
     playground: process.env.NODE_ENV !== 'production'
 };

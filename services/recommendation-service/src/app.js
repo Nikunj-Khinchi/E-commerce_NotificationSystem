@@ -11,6 +11,10 @@ const Product = require('./models/product.model');
 const UserActivity = require('./models/userActivity.model');
 const requestLogger = require('./middlewares/requestLogger.middleware');
 const logger = require('./utils/logger');
+
+const client = require('prom-client');
+const promMid = require('express-prometheus-middleware');
+
 // Initialize express app
 const app = express();
 
@@ -19,6 +23,29 @@ app.use(express.json());
 app.use(cors());
 app.use(requestLogger);
 
+// Create a Histogram for tracking request duration
+const httpRequestDurationMicroseconds = new client.Histogram({
+    name: 'notifications_http_request_duration_seconds',
+    help: 'Duration of HTTP requests in seconds',
+    labelNames: ['method', 'route', 'status_code'],
+    buckets: [0.1, 0.3, 0.5, 1, 1.5, 2, 5],
+});
+
+app.use(promMid({
+    metricsPath: '/metrics',
+    collectDefaultMetrics: true,
+    requestDurationBuckets: [0.1, 0.3, 0.5, 1, 1.5, 2, 5],
+    normalizeStatus: true,
+}));
+
+// Manually track request duration
+app.use((req, res, next) => {
+    const end = httpRequestDurationMicroseconds.startTimer();
+    res.on('finish', () => {
+        end({ method: req.method, route: req.path, status_code: res.statusCode });
+    });
+    next();
+});
 // Routes
 app.use('/api/recommendations', recommendationRoutes);
 
@@ -144,10 +171,7 @@ const initMockData = async () => {
 const startServer = async () => {
     try {
         // Connect to MongoDB
-        await mongoose.connect(config.mongodb.uri, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true
-        });
+        await mongoose.connect(config.mongodb.uri);
         logger.info('Connected to MongoDB');
 
         // Initialize mock data
@@ -163,7 +187,7 @@ const startServer = async () => {
         scheduleRecommendationJobs();
 
         // Start server
-        const server = app.listen(config.port, () => {
+        const server = app.listen(config.port, '0.0.0.0', () => {
             logger.info(`Recommendation service running on port ${config.port}`);
         });
 

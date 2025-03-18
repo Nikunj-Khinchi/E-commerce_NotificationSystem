@@ -1,7 +1,7 @@
 // services/graphql-gateway/src/datasources/user-api.js
 const fetch = require('node-fetch');
 const config = require('../config');
-const cache = require('../utils/cache');
+const cache = require('../utils/redis-cache');
 
 class UserAPI {
     constructor() {
@@ -36,7 +36,7 @@ class UserAPI {
      * @param {Object} credentials - User credentials
      * @returns {Promise<Object>} Login result
      */
-    async loginUser(credentials) {        
+    async loginUser(credentials) {
         const response = await fetch(`${this.baseURL}/api/users/login`, {
             method: 'POST',
             headers: {
@@ -62,7 +62,7 @@ class UserAPI {
      */
     async getUser(userId, token) {
         const cacheKey = `user:${userId}`;
-        
+
         return cache.getOrFetch(cacheKey, async () => {
             const response = await fetch(`${this.baseURL}/api/users/me`, {
                 headers: {
@@ -71,8 +71,7 @@ class UserAPI {
             });
 
             const data = await response.json();
-            console.log("api data", data);
-            
+
             if (!response.ok) {
                 throw new Error(data.message || 'Failed to get user');
             }
@@ -105,7 +104,7 @@ class UserAPI {
         }
 
         // Invalidate user cache
-        cache.invalidate(`user:${userId}`);
+        await cache.invalidate(`user:${userId}`);
 
         return data.data.user;
     }

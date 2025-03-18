@@ -1,7 +1,8 @@
 // services/graphql-gateway/src/datasources/recommendation-api.js
 const fetch = require('node-fetch');
 const config = require('../config');
-const cache = require('../utils/cache');
+const cache = require('../utils/redis-cache');
+
 
 class RecommendationAPI {
     constructor() {
@@ -51,7 +52,7 @@ class RecommendationAPI {
         }
 
         // Invalidate recommendations cache
-        cache.invalidate(`recommendations:${userId}`);
+        await cache.invalidate(`recommendations:${userId}`);
 
         return data.data.recommendations;
     }
@@ -77,7 +78,7 @@ class RecommendationAPI {
         }
 
         // Invalidate recommendations cache as new activity might change them
-        cache.invalidate(`recommendations:${activityData.userId}`);
+        await cache.invalidate(`recommendations:${activityData.userId}`);
 
         return data.data.activity;
     }

@@ -16,15 +16,18 @@
     "apollo-server-express": "^3.12.0",
     "cors": "^2.8.5",
     "express": "^4.18.2",
+    "express-prometheus-middleware": "^1.2.0",
     "graphql": "^16.6.0",
     "graphql-depth-limit": "^1.1.0",
     "graphql-middleware": "^6.1.33",
     "graphql-shield": "^7.6.5",
     "graphql-subscriptions": "^2.0.0",
+    "ioredis": "^5.6.0",
     "jsonwebtoken": "^9.0.0",
     "node-cache": "^5.1.2",
     "node-fetch": "^2.6.9",
     "on-finished": "^2.4.1",
+    "prom-client": "^13.2.0",
     "winston": "^3.17.0"
   },
   "devDependencies": {

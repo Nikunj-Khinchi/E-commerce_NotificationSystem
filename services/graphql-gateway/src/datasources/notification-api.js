@@ -1,7 +1,8 @@
 // services/graphql-gateway/src/datasources/notification-api.js
 const fetch = require('node-fetch');
 const config = require('../config');
-const cache = require('../utils/cache');
+// const cache = require('../utils/cache');
+const cache = require('../utils/redis-cache');
 
 class NotificationAPI {
     constructor() {
@@ -57,7 +58,7 @@ class NotificationAPI {
         }
 
         // Invalidate unread count cache
-        cache.invalidate(`notifications:unread:${userId}`);
+        await cache.invalidate(`notifications:unread:${userId}`);
 
         return data.data.notification;
     }
@@ -79,7 +80,7 @@ class NotificationAPI {
         }
 
         // Invalidate unread count cache
-        cache.invalidate(`notifications:unread:${userId}`);
+        await cache.invalidate(`notifications:unread:${userId}`);
 
         return data.data;
     }
@@ -126,7 +127,7 @@ class NotificationAPI {
         }
 
         // Invalidate unread count cache
-        cache.invalidate(`notifications:unread:${notificationData.userId}`);
+        await cache.invalidate(`notifications:unread:${notificationData.userId}`);
 
         return data.data.notification;
     }

@@ -23,7 +23,7 @@ const createUser = async (userData) => {
         // Publish user created event
         await rabbitmq.publish(
             config.rabbitmq.exchanges.user,
-            'user.created',
+            config.rabbitmq.queues.userCreated,
             {
                 userId: user._id,
                 email: user.email,
@@ -107,7 +107,7 @@ const updateUserPreferences = async (userId, preferences) => {
         // Publish preferences updated event
         await rabbitmq.publish(
             config.rabbitmq.exchanges.user,
-            'user.preferences.updated',
+            config.rabbitmq.queues.userPreferencesUpdated,
             {
                 userId: user._id,
                 preferences: user.preferences,

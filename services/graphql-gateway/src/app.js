@@ -1,4 +1,3 @@
-// services/graphql-gateway/src/app.js
 const express = require('express');
 const cors = require('cors');
 const { ApolloServer } = require('apollo-server-express');
@@ -15,6 +14,9 @@ const NotificationAPI = require('./datasources/notification-api');
 const RecommendationAPI = require('./datasources/recommendation-api');
 const logger = require('./utils/logger');
 
+const client = require('prom-client');
+const promMid = require('express-prometheus-middleware');
+
 async function startServer() {
     // Initialize express app
     const app = express();
@@ -23,13 +25,36 @@ async function startServer() {
     app.use(cors());
     app.use(express.json());
 
+    // Add Prometheus Middleware for API Metrics
+    app.use(promMid({
+        metricsPath: '/metrics',
+        collectDefaultMetrics: true,
+        requestDurationBuckets: [0.1, 0.3, 0.5, 1, 1.5, 2, 5],
+        normalizeStatus: true,
+    }));
+
+
+    // Define GraphQL-Specific Metrics
+    const graphqlRequestDuration = new client.Histogram({
+        name: 'graphql_request_duration_seconds',
+        help: 'Duration of GraphQL requests in seconds',
+        labelNames: ['operation', 'status'],
+        buckets: [0.1, 0.3, 0.5, 1, 2, 5]
+    });
+
+    const graphqlRequestErrors = new client.Counter({
+        name: 'graphql_request_errors_total',
+        help: 'Total number of GraphQL request errors',
+        labelNames: ['operation']
+    });
+
     // Create executable schema
     const schema = makeExecutableSchema({ typeDefs, resolvers });
 
     // Apply permissions middleware
     const schemaWithMiddleware = applyMiddleware(schema, permissions);
 
-    // Initialize Apollo Server
+    // Initialize Apollo Server with Performance Tracking
     const server = new ApolloServer({
         schema: schemaWithMiddleware,
         context: createContext,
@@ -43,11 +68,27 @@ async function startServer() {
         playground: true,
         formatError: (error) => {
             logger.error(error);
+            graphqlRequestErrors.inc({ operation: error.path?.[0] || 'unknown' }); // Track GraphQL Errors
             return {
                 message: error.message,
                 path: error.path
             };
-        }
+        },
+        plugins: [{
+            requestDidStart: async (requestContext) => {
+                const startTime = process.hrtime();
+                return {
+                    willSendResponse: async () => {
+                        const [seconds, nanoseconds] = process.hrtime(startTime);
+                        const duration = seconds + nanoseconds / 1e9;
+                        graphqlRequestDuration.observe({ operation: requestContext.operationName || 'unknown', status: 'success' }, duration);
+                    },
+                    didEncounterErrors: async () => {
+                        graphqlRequestErrors.inc({ operation: requestContext.operationName || 'unknown' });
+                    }
+                };
+            }
+        }]
     });
 
     // Start Apollo Server
@@ -72,7 +113,7 @@ async function startServer() {
     });
 
     // Start server
-    const httpServer = app.listen(config.port, () => {
+    const httpServer = app.listen(config.port, '0.0.0.0',  () => {
         logger.info(`GraphQL gateway running at http://localhost:${config.port}${server.graphqlPath}`);
     });
 

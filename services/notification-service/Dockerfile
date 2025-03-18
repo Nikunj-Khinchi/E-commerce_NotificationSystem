@@ -1,13 +1,18 @@
-FROM node:16-alpine
+# Use official Node.js image
+FROM node:18
 
-WORKDIR /usr/src/app
+# Set working directory
+WORKDIR /app
 
-COPY package*.json ./
-
+# Copy package.json and install dependencies
+COPY package.json package-lock.json ./
 RUN npm install
 
+# Copy the rest of the application
 COPY . .
 
+# Expose the port
 EXPOSE 3002
 
-CMD ["node", "src/app.js"]
+# Start the application
+CMD ["npm", "run", "dev"]
