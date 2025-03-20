@@ -1,4 +1,3 @@
-// services/recommendation-service/src/app.js
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -25,7 +24,7 @@ app.use(requestLogger);
 
 // Create a Histogram for tracking request duration
 const httpRequestDurationMicroseconds = new client.Histogram({
-    name: 'notifications_http_request_duration_seconds',
+    name: 'recommendations_http_request_duration_seconds',
     help: 'Duration of HTTP requests in seconds',
     labelNames: ['method', 'route', 'status_code'],
     buckets: [0.1, 0.3, 0.5, 1, 1.5, 2, 5],

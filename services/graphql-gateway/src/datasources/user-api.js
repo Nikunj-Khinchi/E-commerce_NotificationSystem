@@ -1,4 +1,3 @@
-// services/graphql-gateway/src/datasources/user-api.js
 const fetch = require('node-fetch');
 const config = require('../config');
 const cache = require('../utils/redis-cache');
@@ -8,11 +7,6 @@ class UserAPI {
         this.baseURL = config.services.user.url;
     }
 
-    /**
-     * Register a new user
-     * @param {Object} userData - User registration data
-     * @returns {Promise<Object>} Registration result
-     */
     async registerUser(userData) {
         const response = await fetch(`${this.baseURL}/api/users/register`, {
             method: 'POST',
@@ -31,11 +25,7 @@ class UserAPI {
         return data.data;
     }
 
-    /**
-     * Login a user
-     * @param {Object} credentials - User credentials
-     * @returns {Promise<Object>} Login result
-     */
+
     async loginUser(credentials) {
         const response = await fetch(`${this.baseURL}/api/users/login`, {
             method: 'POST',
@@ -54,12 +44,7 @@ class UserAPI {
         return data.data;
     }
 
-    /**
-     * Get user by ID
-     * @param {String} userId - User ID
-     * @param {String} token - Authentication token
-     * @returns {Promise<Object>} User data
-     */
+
     async getUser(userId, token) {
         const cacheKey = `user:${userId}`;
 
@@ -80,13 +65,7 @@ class UserAPI {
         });
     }
 
-    /**
-     * Update user preferences
-     * @param {String} userId - User ID
-     * @param {Object} preferences - User preferences
-     * @param {String} token - Authentication token
-     * @returns {Promise<Object>} Updated user
-     */
+
     async updateUserPreferences(userId, preferences, token) {
         const response = await fetch(`${this.baseURL}/api/users/preferences`, {
             method: 'PATCH',

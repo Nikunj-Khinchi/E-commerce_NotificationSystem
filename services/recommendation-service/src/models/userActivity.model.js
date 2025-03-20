@@ -1,4 +1,3 @@
-// services/recommendation-service/src/models/user-activity.model.js
 const mongoose = require('mongoose');
 const logger = require('../utils/logger');
 

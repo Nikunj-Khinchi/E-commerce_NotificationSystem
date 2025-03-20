@@ -1,13 +1,7 @@
-// services/user-service/src/services/user.service.js
 const User = require('../models/user.model');
 const rabbitmq = require('../utils/rabbitmq');
 const config = require('../config');
 
-/**
- * Create a new user
- * @param {Object} userData - User data
- * @returns {Promise<Object>} Created user
- */
 const createUser = async (userData) => {
     try {
         // Check if user already exists
@@ -39,12 +33,7 @@ const createUser = async (userData) => {
     }
 };
 
-/**
- * Login a user
- * @param {String} email - User email
- * @param {String} password - User password
- * @returns {Promise<Object>} User object
- */
+
 const loginUser = async (email, password) => {
     try {
         // Find user by email
@@ -65,11 +54,6 @@ const loginUser = async (email, password) => {
     }
 };
 
-/**
- * Get user by ID
- * @param {String} userId - User ID
- * @returns {Promise<Object>} User object
- */
 const getUserById = async (userId) => {
     try {
         const user = await User.findById(userId);
@@ -83,12 +67,7 @@ const getUserById = async (userId) => {
     }
 };
 
-/**
- * Update user preferences
- * @param {String} userId - User ID
- * @param {Object} preferences - User preferences
- * @returns {Promise<Object>} Updated user
- */
+
 const updateUserPreferences = async (userId, preferences) => {
     try {
         const user = await User.findById(userId);

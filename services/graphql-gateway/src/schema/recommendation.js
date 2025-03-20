@@ -1,4 +1,3 @@
-// services/graphql-gateway/src/schema/recommendation.js
 const { gql } = require('apollo-server-express');
 
 const typeDefs = gql`
@@ -20,7 +19,7 @@ const typeDefs = gql`
   }
 
   type Product {
-    id: ID!
+    _id: ID!
     name: String!
     description: String!
     price: Float!
@@ -36,7 +35,7 @@ const typeDefs = gql`
   }
 
   type Recommendations {
-    id: ID!
+    _id: ID!
     userId: ID!
     products: [RecommendedProduct!]!
     createdAt: String!
@@ -57,12 +56,37 @@ const typeDefs = gql`
     metadata: ActivityMetadataInput
   }
 
+  input GenerateRecommendationsInput {
+    categories: [String]
+  }
+
   extend type Query {
     getUserRecommendations: Recommendations!
   }
 
+  # New types for generateUserRecommendations
+  type GeneratedProductRecommendation {
+    _id: ID!
+    productId: ID!
+    score: Float!
+    reason: RecommendationReason!
+  }
+
+  type GeneratedRecommendations {
+    _id: ID!
+    userId: ID!
+    products: [GeneratedProductRecommendation!]!
+    expiresAt: String!
+    sent: Boolean!
+    sentAt: String
+    createdAt: String!
+    updatedAt: String!
+  }
+
   extend type Mutation {
     createUserActivity(input: UserActivityInput!): Boolean!
+    generateUserRecommendations(preferences: GenerateRecommendationsInput): GeneratedRecommendations!
+    # markRecommendationAsSent(id: ID!): Boolean!
   }
 `;
 

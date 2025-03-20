@@ -1,13 +1,8 @@
-// services/notification-service/src/services/notification.service.js
 const Notification = require('../models/notification.model');
 const rabbitmq = require('../utils/rabbitmq');
 const config = require('../config');
 
-/**
- * Create a new notification
- * @param {Object} notificationData - Notification data
- * @returns {Promise<Object>} Created notification
- */
+
 const createNotification = async (notificationData) => {
     try {
         const notification = new Notification(notificationData);
@@ -33,12 +28,6 @@ const createNotification = async (notificationData) => {
     }
 };
 
-/**
- * Get notifications for a user
- * @param {String} userId - User ID
- * @param {Object} options - Query options
- * @returns {Promise<Array>} List of notifications
- */
 const getUserNotifications = async (userId, options = {}) => {
     try {
         const { limit = 20, offset = 0, read, type } = options;
@@ -77,12 +66,6 @@ const getUserNotifications = async (userId, options = {}) => {
     }
 };
 
-/**
- * Mark a notification as read
- * @param {String} notificationId - Notification ID
- * @param {String} userId - User ID
- * @returns {Promise<Object>} Updated notification
- */
 const markNotificationAsRead = async (notificationId, userId) => {
     try {
         const notification = await Notification.findOne({
@@ -104,11 +87,6 @@ const markNotificationAsRead = async (notificationId, userId) => {
     }
 };
 
-/**
- * Mark all notifications as read for a user
- * @param {String} userId - User ID
- * @returns {Promise<Object>} Update result
- */
 const markAllNotificationsAsRead = async (userId) => {
     try {
         const result = await Notification.updateMany(
@@ -117,18 +95,13 @@ const markAllNotificationsAsRead = async (userId) => {
         );
 
         return {
-            updated: result.nModified
+            updated: result.modifiedCount
         };
     } catch (error) {
         throw error;
     }
 };
 
-/**
- * Get unread notifications count for a user
- * @param {String} userId - User ID
- * @returns {Promise<Object>} Count result
- */
 const getUnreadCount = async (userId) => {
     try {
         const count = await Notification.countDocuments({
@@ -142,12 +115,6 @@ const getUnreadCount = async (userId) => {
     }
 };
 
-/**
- * Create promotion notifications for users
- * @param {Array} userIds - List of user IDs
- * @param {Object} promotionData - Promotion data
- * @returns {Promise<Array>} Created notifications
- */
 const createPromotionNotifications = async (userIds, promotionData) => {
     try {
         const notifications = [];
@@ -177,12 +144,6 @@ const createPromotionNotifications = async (userIds, promotionData) => {
     }
 };
 
-/**
- * Create order update notification
- * @param {String} userId - User ID
- * @param {Object} orderData - Order data
- * @returns {Promise<Object>} Created notification
- */
 const createOrderUpdateNotification = async (userId, orderData) => {
     try {
         const notification = await createNotification({
@@ -206,12 +167,6 @@ const createOrderUpdateNotification = async (userId, orderData) => {
     }
 };
 
-/**
- * Create recommendation notification
- * @param {String} userId - User ID
- * @param {Object} recommendationData - Recommendation data
- * @returns {Promise<Object>} Created notification
- */
 const createRecommendationNotification = async (userId, recommendationData) => {
     try {
         const notification = await createNotification({

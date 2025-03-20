@@ -1,4 +1,3 @@
-// services/notification-service/src/jobs/promotion.job.js
 const NotificationService = require('../services/notification.service');
 const logger = require('../utils/logger');
 
@@ -77,11 +76,6 @@ const mockUsers = [
     }
 ];
 
-/**
- * Process promotions and create notifications for eligible users
- * In a real-world scenario, this would fetch data from User and Promotion services
- * @returns {Promise<void>}
- */
 const processPromotions = async () => {
     try {
         logger.info('Processing promotions...');

@@ -1,4 +1,3 @@
-// services/recommendation-service/src/services/recommendation.service.js
 const Recommendation = require('../models/recommendation.model');
 const Product = require('../models/product.model');
 const UserActivity = require('../models/userActivity.model');
@@ -7,11 +6,7 @@ const rabbitmq = require('../utils/rabbitmq');
 const config = require('../config');
 const logger = require('../utils/logger');
 
-/**
- * Create user activity
- * @param {Object} activityData - Activity data
- * @returns {Promise<Object>} Created activity
- */
+
 const createUserActivity = async (activityData) => {
     try {
         // Validate product ID
@@ -32,12 +27,7 @@ const createUserActivity = async (activityData) => {
     }
 };
 
-/**
- * Generate recommendations for a user
- * @param {String} userId - User ID
- * @param {Object} userPreferences - User preferences
- * @returns {Promise<Object>} Generated recommendations
- */
+
 const generateUserRecommendations = async (userId, userPreferences = {}) => {
     try {
         // Check if user already has recent recommendations
@@ -76,11 +66,7 @@ const generateUserRecommendations = async (userId, userPreferences = {}) => {
     }
 };
 
-/**
- * Get user recommendations
- * @param {String} userId - User ID
- * @returns {Promise<Object>} Recommendations with product details
- */
+
 const getUserRecommendations = async (userId) => {
     try {
         // Find latest recommendations or generate new ones
@@ -101,7 +87,7 @@ const getUserRecommendations = async (userId) => {
 
                 return {
                     product: product ? {
-                        id: product._id,
+                        _id: product._id,
                         name: product.name,
                         description: product.description,
                         price: product.price,
@@ -126,7 +112,7 @@ const getUserRecommendations = async (userId) => {
         }
 
         return {
-            id: recommendations._id,
+            _id: recommendations._id,
             userId: recommendations.userId,
             products: validProducts,
             createdAt: recommendations.createdAt,
@@ -137,10 +123,7 @@ const getUserRecommendations = async (userId) => {
     }
 };
 
-/**
- * Generate batch recommendations for multiple users
- * @returns {Promise<Array>} Generated recommendations
- */
+
 const generateBatchRecommendations = async () => {
     try {
         // Get unique user IDs from activity data
@@ -172,11 +155,7 @@ const generateBatchRecommendations = async () => {
     }
 };
 
-/**
- * Mark a recommendation as sent
- * @param {String} recommendationId - Recommendation ID
- * @returns {Promise<Object>} Updated recommendation
- */
+
 const markRecommendationAsSent = async (recommendationId) => {
     try {
         const recommendation = await Recommendation.findById(recommendationId);
@@ -195,11 +174,7 @@ const markRecommendationAsSent = async (recommendationId) => {
     }
 };
 
-/**
- * Publish recommendation created event
- * @param {Object} recommendation - Recommendation document
- * @returns {Promise<boolean>} Success flag
- */
+
 const publishRecommendationCreated = async (recommendation) => {
     try {
         const products = await Promise.all(

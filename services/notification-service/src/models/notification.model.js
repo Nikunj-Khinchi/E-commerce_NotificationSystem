@@ -1,4 +1,3 @@
-// services/notification-service/src/models/notification.model.js
 const mongoose = require('mongoose');
 
 const notificationSchema = new mongoose.Schema({

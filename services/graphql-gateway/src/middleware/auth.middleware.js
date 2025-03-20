@@ -1,4 +1,3 @@
-// services/graphql-gateway/src/middleware/auth.middleware.js
 const { AuthenticationError } = require('apollo-server-express');
 const { shield, rule, allow, deny } = require('graphql-shield');
 const jwtUtils = require('../utils/jwt.utils');

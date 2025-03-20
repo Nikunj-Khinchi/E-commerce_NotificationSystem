@@ -1,4 +1,3 @@
-// services/graphql-gateway/src/schema/notification.js
 const { gql } = require('apollo-server-express');
 
 const typeDefs = gql`
@@ -63,6 +62,39 @@ const typeDefs = gql`
     type: NotificationType
   }
 
+  # input NotificationContentInput {
+  #   message: String!
+  #   discount: String
+  #   expiresAt: String
+  #   imageUrl: String
+  #   orderId: String
+  #   status: String
+  #   products: [ProductPreviewInput]
+  #   updatedAt: String
+  # }
+
+  # input ProductPreviewInput {
+  #   id: ID!
+  #   name: String!
+  #   price: Float!
+  #   imageUrl: String
+  #   category: String
+  # }
+
+  # input NotificationMetadataInput {
+  #   promotionId: String
+  #   orderId: String
+  #   recommendationId: String
+  # }
+
+  # input CreateNotificationInput {
+  #   userId: ID!
+  #   type: NotificationType!
+  #   title: String!
+  #   content: NotificationContentInput!
+  #   metadata: NotificationMetadataInput
+  # }
+
   extend type Query {
     getUserNotifications(filter: NotificationsFilterInput): NotificationsResponse!
     getUnreadNotificationsCount: Int!
@@ -71,6 +103,7 @@ const typeDefs = gql`
   extend type Mutation {
     markNotificationAsRead(notificationId: ID!): Notification!
     markAllNotificationsAsRead: ReadAllNotificationsResponse!
+    # createNotification(input: CreateNotificationInput!): Notification!
   }
 `;
 

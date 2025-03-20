@@ -1,7 +1,6 @@
-// services/graphql-gateway/src/datasources/notification-api.js
+
 const fetch = require('node-fetch');
 const config = require('../config');
-// const cache = require('../utils/cache');
 const cache = require('../utils/redis-cache');
 
 class NotificationAPI {
@@ -9,12 +8,6 @@ class NotificationAPI {
         this.baseURL = config.services.notification.url;
     }
 
-    /**
-     * Get notifications for a user
-     * @param {String} userId - User ID
-     * @param {Object} options - Query options
-     * @returns {Promise<Object>} Notifications with pagination
-     */
     async getUserNotifications(userId, options = {}) {
         const { limit, offset, read, type } = options;
 
@@ -40,12 +33,7 @@ class NotificationAPI {
         return data.data;
     }
 
-    /**
-     * Mark a notification as read
-     * @param {String} userId - User ID
-     * @param {String} notificationId - Notification ID
-     * @returns {Promise<Object>} Updated notification
-     */
+
     async markNotificationAsRead(userId, notificationId) {
         const response = await fetch(`${this.baseURL}/api/notifications/users/${userId}/${notificationId}/read`, {
             method: 'PATCH',
@@ -63,11 +51,7 @@ class NotificationAPI {
         return data.data.notification;
     }
 
-    /**
-     * Mark all notifications as read for a user
-     * @param {String} userId - User ID
-     * @returns {Promise<Object>} Update result
-     */
+
     async markAllNotificationsAsRead(userId) {
         const response = await fetch(`${this.baseURL}/api/notifications/users/${userId}/read-all`, {
             method: 'PATCH',
@@ -85,11 +69,6 @@ class NotificationAPI {
         return data.data;
     }
 
-    /**
-     * Get unread notifications count for a user
-     * @param {String} userId - User ID
-     * @returns {Promise<Number>} Unread count
-     */
     async getUnreadCount(userId) {
         const cacheKey = `notifications:unread:${userId}`;
 
@@ -106,11 +85,6 @@ class NotificationAPI {
         }, 60); // shorter TTL for unread count
     }
 
-    /**
-     * Create a notification
-     * @param {Object} notificationData - Notification data
-     * @returns {Promise<Object>} Created notification
-     */
     async createNotification(notificationData) {
         const response = await fetch(`${this.baseURL}/api/notifications`, {
             method: 'POST',

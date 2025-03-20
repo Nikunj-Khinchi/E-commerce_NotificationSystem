@@ -1,4 +1,3 @@
-// services/graphql-gateway/src/datasources/recommendation-api.js
 const fetch = require('node-fetch');
 const config = require('../config');
 const cache = require('../utils/redis-cache');
@@ -9,11 +8,7 @@ class RecommendationAPI {
         this.baseURL = config.services.recommendation.url;
     }
 
-    /**
-     * Get recommendations for a user
-     * @param {String} userId - User ID
-     * @returns {Promise<Object>} User recommendations
-     */
+
     async getUserRecommendations(userId) {
         const cacheKey = `recommendations:${userId}`;
 
@@ -30,12 +25,7 @@ class RecommendationAPI {
         }, 3600); // Cache for 1 hour
     }
 
-    /**
-     * Generate recommendations for a user
-     * @param {String} userId - User ID
-     * @param {Object} preferences - User preferences
-     * @returns {Promise<Object>} Generated recommendations
-     */
+
     async generateUserRecommendations(userId, preferences) {
         const response = await fetch(`${this.baseURL}/api/recommendations/users/${userId}/generate`, {
             method: 'POST',
@@ -57,11 +47,6 @@ class RecommendationAPI {
         return data.data.recommendations;
     }
 
-    /**
-     * Create user activity
-     * @param {Object} activityData - User activity data
-     * @returns {Promise<Object>} Created activity
-     */
     async createUserActivity(activityData) {
         const response = await fetch(`${this.baseURL}/api/recommendations/activities`, {
             method: 'POST',

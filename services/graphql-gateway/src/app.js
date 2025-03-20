@@ -113,7 +113,7 @@ async function startServer() {
     });
 
     // Start server
-    const httpServer = app.listen(config.port, '0.0.0.0',  () => {
+    const httpServer = app.listen(config.port,  () => {
         logger.info(`GraphQL gateway running at http://localhost:${config.port}${server.graphqlPath}`);
     });
 

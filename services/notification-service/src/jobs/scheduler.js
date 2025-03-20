@@ -1,4 +1,3 @@
-// services/notification-service/src/jobs/scheduler.js
 const cron = require('node-cron');
 const config = require('../config');
 const orderUpdateJob = require('./orderUpdate.job');

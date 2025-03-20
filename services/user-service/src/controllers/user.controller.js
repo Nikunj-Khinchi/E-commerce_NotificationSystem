@@ -1,13 +1,7 @@
-// services/user-service/src/controllers/user.controller.js
 const UserService = require('../services/user.service');
 const jwtUtils = require('../utils/jwt.utils');
 
-/**
- * Register a new user
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- * @returns {Promise<void>}
- */
+
 const registerUser = async (req, res) => {
     try {
         const { name, email, password, preferences } = req.body;
@@ -36,19 +30,12 @@ const registerUser = async (req, res) => {
     }
 };
 
-/**
- * Login a user
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- * @returns {Promise<void>}
- */
 const loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
 
         const user = await UserService.loginUser(email, password);
         const token = jwtUtils.generateToken(user);
-        console.log("user", user);
         
         res.status(200).json({
             success: true,
@@ -73,12 +60,7 @@ const loginUser = async (req, res) => {
     }
 };
 
-/**
- * Get user details
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- * @returns {Promise<void>}
- */
+
 const getUserDetails = async (req, res) => {
     try {
         const userId = req.user.id;
@@ -98,12 +80,7 @@ const getUserDetails = async (req, res) => {
     }
 };
 
-/**
- * Update user preferences
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- * @returns {Promise<void>}
- */
+
 const updateUserPreferences = async (req, res) => {
     try {
         const userId = req.user.id;

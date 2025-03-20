@@ -1,4 +1,3 @@
-// services/graphql-gateway/src/schema/index.js
 const { gql } = require('apollo-server-express');
 const userSchema = require('./user');
 const notificationSchema = require('./notification');

@@ -1,0 +1,275 @@
+# For Authentication Mutaions & Query use this
+# Header pass Authorization: Bearer token
+
+
+query ExampleQuery {
+    health
+}
+
+
+mutation RegisterUser {
+    registerUser(
+        input: {
+            name: "testNew"
+            email: "new@gmail.com"
+            password: "123456"
+            preferences: {
+                notifications: {
+                    promotions: true
+                    order_updates: true
+                    recommendations: true
+                }
+                categories: ["test", "tech"]
+            }
+        }
+    ) {
+        user {
+            _id
+            name
+            email
+            createdAt
+            updatedAt
+            preferences {
+                categories
+                notifications {
+                    promotions
+                    order_updates
+                    recommendations
+                }
+            }
+        }
+        token
+    }
+}
+
+
+
+
+
+
+mutation LoginUser {
+    loginUser(input: { email: "new@gmail.com", password: "123456" }) {
+    user {
+            _id
+            name
+            email
+      preferences {
+                categories
+        notifications {
+                    order_updates
+                    promotions
+                    recommendations
+                }
+            }
+            updatedAt
+            createdAt
+        }
+        token
+    }
+}
+
+
+
+# 4. Get Current User(Authenticated Query)
+# Header pass Authorization: Bearer token
+
+query GetUser {
+    getUser {
+        _id
+        name
+        email
+        createdAt
+        updatedAt
+        preferences {
+            categories
+            notifications {
+                promotions
+                order_updates
+                recommendations
+            }
+        }
+    }
+}
+
+# 5. Update User Preferences(Authenticated Mutation)
+# Header pass Authorization: Bearer token
+
+
+mutation UpdateUserPreferences {
+    updateUserPreferences(
+        preferences: {
+            notifications: {
+                promotions: true
+                order_updates: false
+                recommendations: false
+            }
+            categories: ["electronics", "test"]
+        }
+    ) {
+        _id
+        name
+        email
+        createdAt
+        updatedAt
+        preferences {
+            categories
+            notifications {
+                promotions
+                order_updates
+                recommendations
+            }
+        }
+    }
+}
+
+
+ 
+
+
+# 6. Get Notifications(Authenticated Query)
+
+
+query GetUserNotifications {
+    getUserNotifications(
+        filter: { limit: 10, offset: 0, read: false, type: promotion }
+    ) {
+        notifications {
+            _id
+            userId
+            type
+            title
+            read
+            sentAt
+            readAt
+            createdAt
+            updatedAt
+            content {
+                message
+                discount
+                expiresAt
+                imageUrl
+                orderId
+                status
+                updatedAt
+                products {
+                    id
+                    name
+                    price
+                    imageUrl
+                    category
+                }
+            }
+        }
+        pagination {
+            total
+            limit
+            offset
+            hasMore
+        }
+    }
+}
+
+
+
+# 7. Get Unread Notifications Count(Authenticated Query)
+query GetUnreadNotificationsCount {
+    getUnreadNotificationsCount
+}
+
+
+
+# 8. Mark Notification as Read (Authenticated Mutation)
+
+mutation MarkNotificationAsRead {
+    markNotificationAsRead(notificationId: "67db904d267ab069d2e18e16") {
+        _id
+        userId
+        type
+        title
+        read
+        sentAt
+        readAt
+        createdAt
+        updatedAt
+        content {
+            message
+            discount
+            expiresAt
+            imageUrl
+            orderId
+            status
+            updatedAt
+        }
+    }
+}
+
+
+# 9. Mark All Notifications as Read (Authenticated Mutation)
+
+mutation MarkAllNotificationsAsRead {
+    markAllNotificationsAsRead {
+        updated
+    }
+}
+
+# 10. Get Recommendations(Authenticated Query)
+
+query GetUserRecommendations {
+    getUserRecommendations {
+        _id
+        userId
+        createdAt
+        expiresAt
+        products {
+            score
+            reason
+            product {
+                _id
+                name
+                description
+                price
+                imageUrl
+                category
+                rating
+            }
+        }
+    }
+}
+
+
+# 11. Generate Recommendations(Authenticated Mutation)
+
+
+
+mutation GenerateUserRecommendations {
+    generateUserRecommendations(
+        preferences: { categories: ["electronics", "books"] }
+    ) {
+        _id
+        userId
+        products {
+            _id
+            productId
+            score
+            reason
+        }
+        sent
+        expiresAt
+        sentAt
+        createdAt
+        updatedAt
+    }
+}
+
+
+# 12. Record User Activity(Authenticated Mutation)
+
+mutation CreateUserActivity {
+    createUserActivity(
+        input: {
+            productId: "67d6744d6c8ae0ff43236017"
+            activityType: view
+            metadata: { viewDuration: 120 }
+        }
+    )
+}

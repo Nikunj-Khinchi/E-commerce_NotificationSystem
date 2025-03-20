@@ -1,4 +1,3 @@
-// services/graphql-gateway/src/resolvers/user.resolver.js
 const userResolvers = {
     Query: {
         getUser: async (_, args, { dataSources, user }) => {

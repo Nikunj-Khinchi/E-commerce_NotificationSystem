@@ -1,4 +1,3 @@
-// services/graphql-gateway/src/resolvers/notification.resolver.js
 const notificationResolvers = {
     Query: {
         getUserNotifications: async (_, { filter = {} }, { dataSources, user }) => {
@@ -34,7 +33,15 @@ const notificationResolvers = {
             }
 
             return dataSources.notificationAPI.markAllNotificationsAsRead(user.id);
-        }
+        },
+
+        // createNotification: async (_, { input }, { dataSources, user }) => {
+        //     // Verify if user has admin privileges or is creating for themselves
+        //     if (!user) {
+        //         throw new Error('Authentication required');
+        //     }
+        //     return dataSources.notificationAPI.createNotification(input);
+        // }
     }
 };
 

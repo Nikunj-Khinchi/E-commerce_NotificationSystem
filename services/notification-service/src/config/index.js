@@ -1,4 +1,3 @@
-// services/notification-service/src/config/index.js
 module.exports = {
     port: process.env.PORT || 3002,
     mongodb: {

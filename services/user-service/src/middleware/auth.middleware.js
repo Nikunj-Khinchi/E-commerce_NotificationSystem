@@ -1,13 +1,5 @@
-// services/user-service/src/middleware/auth.middleware.js
 const jwtUtils = require('../utils/jwt.utils');
 
-/**
- * Authenticate user middleware
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- * @param {Function} next - Express next function
- * @returns {void}
- */
 const authenticate = (req, res, next) => {
     try {
         // Get token from header

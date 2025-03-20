@@ -1,12 +1,6 @@
-// services/notification-service/src/controllers/notification.controller.js
 const NotificationService = require('../services/notification.service');
 
-/**
- * Get notifications for a user
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- * @returns {Promise<void>}
- */
+
 const getUserNotifications = async (req, res) => {
     try {
         const { userId } = req.params;
@@ -33,12 +27,7 @@ const getUserNotifications = async (req, res) => {
     }
 };
 
-/**
- * Mark a notification as read
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- * @returns {Promise<void>}
- */
+
 const markNotificationAsRead = async (req, res) => {
     try {
         const { userId, notificationId } = req.params;
@@ -59,12 +48,7 @@ const markNotificationAsRead = async (req, res) => {
     }
 };
 
-/**
- * Mark all notifications as read for a user
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- * @returns {Promise<void>}
- */
+
 const markAllNotificationsAsRead = async (req, res) => {
     try {
         const { userId } = req.params;
@@ -83,12 +67,7 @@ const markAllNotificationsAsRead = async (req, res) => {
     }
 };
 
-/**
- * Get unread notifications count for a user
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- * @returns {Promise<void>}
- */
+
 const getUnreadCount = async (req, res) => {
     try {
         const { userId } = req.params;
@@ -107,12 +86,7 @@ const getUnreadCount = async (req, res) => {
     }
 };
 
-/**
- * Create a new notification
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- * @returns {Promise<void>}
- */
+
 const createNotification = async (req, res) => {
     try {
         const { userId, type, title, content, metadata } = req.body;

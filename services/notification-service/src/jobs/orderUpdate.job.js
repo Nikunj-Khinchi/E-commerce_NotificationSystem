@@ -1,4 +1,3 @@
-// services/notification-service/src/jobs/order-update.job.js
 const NotificationService = require('../services/notification.service');
 const logger = require('../utils/logger');
 
@@ -29,11 +28,6 @@ const mockOrders = [
     }
 ];
 
-/**
- * Process order updates and create notifications
- * In a real-world scenario, this would fetch data from an Order Service
- * @returns {Promise<void>}
- */
 const processOrderUpdates = async () => {
     try {
         logger.info('Processing order updates...');

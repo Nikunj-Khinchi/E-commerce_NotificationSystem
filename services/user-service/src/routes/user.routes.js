@@ -1,4 +1,3 @@
-// services/user-service/src/routes/user.routes.js
 const express = require('express');
 const userController = require('../controllers/user.controller');
 const { authenticate } = require('../middleware/auth.middleware');

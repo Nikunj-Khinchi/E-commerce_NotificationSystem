@@ -1,4 +1,4 @@
-// services/user-service/src/utils/rabbitmq.js
+
 const amqp = require('amqplib');
 const config = require('../config');
 const logger = require('./logger');
@@ -30,10 +30,7 @@ const metrics = {
     })
 };
 
-/**
- * Connect to RabbitMQ
- * @returns {Promise<void>}
- */
+
 const connect = async () => {
     try {
         connection = await amqp.connect(config.rabbitmq.uri);
@@ -68,13 +65,6 @@ const connect = async () => {
     }
 };
 
-/**
- * Publish a message to an exchange
- * @param {String} exchange - Exchange name
- * @param {String} routingKey - Routing key
- * @param {Object} message - Message to publish
- * @returns {Promise<boolean>}
- */
 const publish = async (exchange, routingKey, message) => {
     try {
         if (!channel) {
@@ -102,12 +92,6 @@ const publish = async (exchange, routingKey, message) => {
 };
 
 
-/**
- * Consume messages from a queue
- * @param {String} queue - Queue name
- * @param {Function} callback - Message handler
- * @returns {Promise<void>}
- */
 const consume = async (queue, callback) => {
     try {
         if (!channel) {
@@ -151,10 +135,7 @@ const startQueueMonitoring = () => {
     }, 5000); // Check every 5 seconds
 };
 
-/**
- * Close the RabbitMQ connection
- * @returns {Promise<void>}
- */
+
 const close = async () => {
     try {
         if (channel) {

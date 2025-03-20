@@ -1,4 +1,3 @@
-// services/graphql-gateway/src/resolvers/index.js
 const userResolvers = require('./user.resolver');
 const notificationResolvers = require('./notification.resolver');
 const recommendationResolvers = require('./recommendation.resolver');

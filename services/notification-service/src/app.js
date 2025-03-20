@@ -1,4 +1,3 @@
-// services/notification-service/src/app.js
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -82,7 +81,7 @@ const setupConsumers = async () => {
                     }
                 });
 
-                logger.info('Created welcome notification for user:', message.userId);
+                logger.info(`Created welcome notification for user: ${message.userId}`);
             } catch (error) {
                 logger.error('Error processing user created event:', error);
             }
@@ -121,7 +120,7 @@ const setupConsumers = async () => {
                     }
                 );
 
-                logger.info('Created recommendation notification for user:', message.userId);
+                logger.info(`Created recommendation notification for user:  ${message.userId}`);
             } catch (error) {
                 logger.error('Error processing recommendation event:', error);
             }

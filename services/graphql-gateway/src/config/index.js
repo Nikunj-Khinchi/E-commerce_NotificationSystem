@@ -1,4 +1,3 @@
-// services/graphql-gateway/src/config/index.js
 module.exports = {
     port: process.env.PORT || 4000,
     services: {

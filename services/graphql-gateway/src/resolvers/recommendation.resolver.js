@@ -1,4 +1,3 @@
-// services/graphql-gateway/src/resolvers/recommendation.resolver.js
 const recommendationResolvers = {
     Query: {
         getUserRecommendations: async (_, args, { dataSources, user }) => {
@@ -26,6 +25,12 @@ const recommendationResolvers = {
             await dataSources.recommendationAPI.createUserActivity(activityData);
 
             return true;
+        },
+        generateUserRecommendations: async (_, { preferences }, { dataSources, user }) => {
+            if (!user) {
+                throw new Error('Authentication required');
+            }
+            return dataSources.recommendationAPI.generateUserRecommendations(user.id, preferences);
         }
     }
 };

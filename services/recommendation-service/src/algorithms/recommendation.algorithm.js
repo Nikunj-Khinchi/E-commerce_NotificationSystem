@@ -1,14 +1,7 @@
-// services/recommendation-service/src/algorithms/recommendation.algorithm.js
 const Product = require('../models/product.model');
 const UserActivity = require('../models/userActivity.model');
 const config = require('../config');
 
-/**
- * Generate personalized recommendations for a user
- * @param {String} userId - User ID
- * @param {Object} userPreferences - User preferences
- * @returns {Promise<Array>} Recommended products with scores
- */
 const generateRecommendations = async (userId, userPreferences = {}) => {
     try {
         // Step 1: Get user's activity history
@@ -83,14 +76,6 @@ const generateRecommendations = async (userId, userPreferences = {}) => {
     }
 };
 
-/**
- * Score products based on user activity and preferences
- * @param {String} userId - User ID
- * @param {Array} candidateProducts - Candidate products
- * @param {Array} userActivities - User activities
- * @param {Object} userPreferences - User preferences
- * @returns {Promise<Array>} Scored products
- */
 const scoreProducts = async (userId, candidateProducts, userActivities, userPreferences) => {
     // Extract user preferred categories from preferences
     const preferredCategories = new Set(
@@ -219,12 +204,7 @@ const scoreProducts = async (userId, candidateProducts, userActivities, userPref
     }).sort((a, b) => b.score - a.score);
 };
 
-/**
- * Get popular recommendations when user has no activity
- * @param {String} userId - User ID
- * @param {Object} userPreferences - User preferences
- * @returns {Promise<Array>} Recommended products with scores
- */
+
 const getPopularRecommendations = async (userId, userPreferences = {}) => {
     try {
         const preferredCategories = userPreferences.categories || [];
